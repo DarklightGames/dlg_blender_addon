@@ -59,7 +59,6 @@ class DLG_OP_GenerateMarkersForStrips(Operator):
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
-        timeline_markers = context.scene.timeline_markers
         generate_markers(context.selected_nla_strips)
         
         return {'FINISHED'}
