@@ -31,7 +31,7 @@ class DLG_OP_GenerateMarkers(Operator):
         for nla_track in selected_nla_tracks:
             for strip in nla_track.strips:
                 marker_name=strip.name.replace(props.marker_name_replace, props.marker_name_replace_with)
-                timeline_markers.new(marker_name, frame=strip.frame_start)
+                timeline_markers.new(marker_name, frame=int(strip.frame_start))
 
         return {'FINISHED'}
 
