@@ -1,5 +1,20 @@
 import bpy
-from bpy.types import Panel, Operator
+from bpy.types import Panel, Operator, NlaStrip
+
+
+def get_marker_name(strip: NlaStrip) -> str:
+    props = bpy.context.scene.dlg_props
+    name = strip.action.name if props.use_action_names_for_markers else strip.name
+
+    return name.replace(props.marker_name_replace, props.marker_name_replace_with)
+
+
+def generate_markers(strips) -> None:
+    timeline_markers = bpy.context.scene.timeline_markers
+
+    for strip in strips:
+        timeline_markers.new(get_marker_name(strip), frame=int(strip.frame_start))
+
 
 class DLG_PT_Markers(Panel):
     bl_label = 'Markers'
@@ -11,8 +26,10 @@ class DLG_PT_Markers(Panel):
         props = context.scene.dlg_props
         layout = self.layout
 
+        layout.prop(props, 'use_action_names_for_markers')
         layout.prop(props, 'marker_name_replace')
         layout.prop(props, 'marker_name_replace_with')
+        layout.separator()
         layout.operator(DLG_OP_GenerateMarkersForTracks.bl_idname, text='Generate for Tracks')
         layout.operator(DLG_OP_GenerateMarkersForStrips.bl_idname, text='Generate for Strips')
         layout.operator(DLG_OP_ClearAllMarkers.bl_idname, text='Clear All')
@@ -25,16 +42,11 @@ class DLG_OP_GenerateMarkersForTracks(Operator):
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
-        props = context.scene.dlg_props
         ad = context.object.animation_data
-        timeline_markers = context.scene.timeline_markers
         selected_nla_tracks = [*filter(lambda x: x.select, ad.nla_tracks)]
 
         for nla_track in selected_nla_tracks:
-            for strip in nla_track.strips:
-                # TODO: refactor duplicate code in DLG_OL_GenerateMarkersForStrips
-                marker_name=strip.name.replace(props.marker_name_replace, props.marker_name_replace_with)
-                timeline_markers.new(marker_name, frame=int(strip.frame_start))
+            generate_markers(nla_track.strips)
 
         return {'FINISHED'}
 
@@ -46,16 +58,9 @@ class DLG_OP_GenerateMarkersForStrips(Operator):
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
-        props = context.scene.dlg_props
-        ad = context.object.animation_data
         timeline_markers = context.scene.timeline_markers
-        strips = context.selected_nla_strips
+        generate_markers(context.selected_nla_strips)
         
-        for strip in strips:
-            # !
-            marker_name=strip.name.replace(props.marker_name_replace, props.marker_name_replace_with)
-            timeline_markers.new(marker_name, frame=int(strip.frame_start))
-
         return {'FINISHED'}
 
 

@@ -48,6 +48,10 @@ class DlgSceneProperties(PropertyGroup):
         name='Active Action Group')
 
     # Markers
+    use_action_names_for_markers: BoolProperty(
+        default=False,
+        name='Use Action Names',
+        description='Use names of referenced actions instead of strip names')
     marker_name_replace: StringProperty(name='Replace')
     marker_name_replace_with: StringProperty(name='With')
 
