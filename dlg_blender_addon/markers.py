@@ -1,4 +1,5 @@
 import bpy
+from typing import Iterable
 from bpy.types import Panel, Operator, NlaStrip
 
 
@@ -9,7 +10,7 @@ def get_marker_name(strip: NlaStrip) -> str:
     return name.replace(props.marker_name_replace, props.marker_name_replace_with)
 
 
-def generate_markers(strips) -> None:
+def generate_markers(strips: Iterable[NlaStrip]) -> None:
     timeline_markers = bpy.context.scene.timeline_markers
 
     for strip in strips:
