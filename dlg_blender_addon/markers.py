@@ -13,7 +13,7 @@ class DLG_PT_Markers(Panel):
 
         layout.prop(props, 'marker_name_replace')
         layout.prop(props, 'marker_name_replace_with')
-        layout.operator(DLG_OP_CreateMarkers.bl_idname)
+        layout.operator(DLG_OP_GenerateMarkers.bl_idname)
         layout.operator(DLG_OP_ClearAllMarkers.bl_idname)
 
 
