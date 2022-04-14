@@ -47,6 +47,10 @@ class DlgSceneProperties(PropertyGroup):
     anim_groups_index: IntProperty(
         name='Active Action Group')
 
+    # Markers
+    marker_name_replace: StringProperty(name='Replace')
+    marker_name_replace_with: StringProperty(name='With')
+
     # Action Bake
     action_index: IntProperty(default=0)
     filter_name: StringProperty(options={'TEXTEDIT_UPDATE'})
