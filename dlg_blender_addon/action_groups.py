@@ -85,7 +85,7 @@ class DLG_OP_PushDownActionGroup(Operator):
             action = action_item.action
             strip = track.strips.new(
                 name=action.name,
-                start=next_strip_frame,
+                start=int(next_strip_frame),
                 action=action)
 
             action_frame_start, action_frame_end = action.frame_range

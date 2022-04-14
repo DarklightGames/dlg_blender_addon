@@ -40,8 +40,8 @@ def bake_action(action: Action) -> None:
     source_ao.animation_data.action = target_ao.animation_data.action = action
     action_frame_start, action_frame_end = action.frame_range
 
-    bpy.ops.nla.bake(frame_start=action_frame_start,
-                     frame_end=action_frame_end,
+    bpy.ops.nla.bake(frame_start=int(action_frame_start),
+                     frame_end=int(action_frame_end),
                      step=1,
                      only_selected=True,
                      visual_keying=True,
