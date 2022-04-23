@@ -1,13 +1,19 @@
 import bpy
-from bpy.types import PropertyGroup, Action, Object, bpy_prop_collection
+from bpy.types import PropertyGroup, Action, Object, bpy_prop_collection, PoseBone, Context, Object
 from bpy.props import StringProperty, PointerProperty, CollectionProperty, BoolProperty, IntProperty
 from . import utils
+from typing import List
 
 
 class DlgActionGroupItem(PropertyGroup):
     action: PointerProperty(type=Action)
     is_selected: BoolProperty(default=False)
 
+class DlgTargetBone(PropertyGroup):
+    name: StringProperty()
+
+    def pose_bone(self, object: Object) -> PoseBone:
+        return object.pose.bones[self.name]
 
 class DlgActionGroup(PropertyGroup):
     name: StringProperty(
@@ -56,6 +62,7 @@ class DlgSceneProperties(PropertyGroup):
     marker_name_replace_with: StringProperty(name='With')
 
     # Action Bake
+    target_bones: CollectionProperty(type=DlgTargetBone)
     action_index: IntProperty(default=0)
     filter_name: StringProperty(options={'TEXTEDIT_UPDATE'})
     bitflag_filter_item = 1 << 30
@@ -68,6 +75,7 @@ class DlgSceneProperties(PropertyGroup):
 
 
 __classes__ = [
+    DlgTargetBone,
     DlgActionGroupItem,
     DlgActionGroup,
     DlgSceneProperties
