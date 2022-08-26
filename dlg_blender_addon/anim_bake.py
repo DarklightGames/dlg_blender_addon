@@ -11,7 +11,6 @@ def deselect_all_bones() -> None:
 def select_bone(object: Object, name: str) -> None:
     pose_bone = object.pose.bones[name]
     if pose_bone:
-        print(pose_bone.name)
         pose_bone.bone.select = True
 
 
@@ -50,7 +49,7 @@ def deselect_all_actions(actions: bpy_prop_collection) -> None:
 
 
 def bake_action(action: Action) -> None:
-    print(action)
+    print('Baking {}'.format(action.name))
 
     pg = bpy.context.scene.dlg_props
     source_ao = pg.source_armature
@@ -58,7 +57,7 @@ def bake_action(action: Action) -> None:
     source_ao.animation_data.action = target_ao.animation_data.action = action
     action_frame_start, action_frame_end = action.frame_range
 
-    deselect_all_actions()
+    deselect_all_bones()
     select_target_bones(target_ao)
 
     bpy.ops.nla.bake(frame_start=int(action_frame_start),
@@ -143,6 +142,8 @@ class DLG_PT_AnimationBaking(Panel):
         debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
 
         layout.prop(context.object.pose.bones['PROPERTIES'], '["IK/FK"]')
+        layout.prop(context.object.pose.bones['PROPERTIES'], '["Retarget (Import)"]')
+        layout.prop(context.object.pose.bones['PROPERTIES'], '["Snap IK to FK"]')
 
 
 class DLG_UL_ActionList(UIList):
@@ -175,6 +176,7 @@ class DLG_OP_BakeActions(Operator):
 
     def execute(self, context):
         bake_selected_actions()
+        deselect_all_actions(bpy.data.actions)
         return {'FINISHED'}
 
 
