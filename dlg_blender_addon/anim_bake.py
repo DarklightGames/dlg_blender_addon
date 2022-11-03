@@ -1,6 +1,6 @@
 import bpy
 from bpy.types import Action, UIList, Panel, Operator, UI_UL_list, bpy_prop_collection, Object, PoseBone
-from typing import List
+from typing import List, Dict, Any
 
 
 def deselect_all_bones() -> None:
@@ -77,11 +77,39 @@ def bake_selected_actions() -> None:
         bake_action(action)
 
 
+def run_property_automations_on_bone(bone: PoseBone, autoprop_dict: Dict[str, Any], old_props: Dict[str, Any] = {}) -> None:
+    for i, (key, value) in enumerate(autoprop_dict.items()):
+        try:
+            if value != bone[key]:
+                print(f'Auto-prop: Setting {key} to {value} on bone {bone.name}')
+                old_props[key] = bone[key]
+                bone[key] = value
+
+        except KeyError as err:
+            print(f'Auto-prop failed: {err}')
+
+
+def run_all_property_automations(autoprop_dict_name: str, old_props: Dict[PoseBone, Dict[str, Any]] = {}) -> None:
+    for bone in bpy.context.object.pose.bones:
+        try:
+            old_bone_props = {}
+            run_property_automations_on_bone(bone, bone[autoprop_dict_name], old_bone_props)
+            old_props[bone] = old_bone_props
+        except KeyError:
+            pass
+
+
 class DLG_PT_AnimationBaking(Panel):
-    bl_label = 'Animation Baking'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'DLG Tools'
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = 'data'
+    bl_category = 'Darklight Animation Baker'
+    bl_label = 'Darklight Animation Baker'
+    bl_options = {'DEFAULT_CLOSED'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.view_layer.objects.active.mode == 'POSE' 
 
     def draw(self, context):
         layout = self.layout
@@ -93,12 +121,9 @@ class DLG_PT_AnimationBaking(Panel):
         ao_split = layout.split(factor=0.2)
         ao_left_col = ao_split.column()
         ao_left_col.label(text=f'Source')
-        ao_left_col.label(text=f'Target')
         ao_right_col = ao_split.column()
         ao_right_col.prop_search(
             pg, 'source_armature', context.scene, 'objects', text='', icon='OUTLINER_OB_ARMATURE')
-        ao_right_col.label(text=ob.name,
-                           icon='OUTLINER_OB_ARMATURE')
 
         layout.separator()
 
@@ -138,12 +163,8 @@ class DLG_PT_AnimationBaking(Panel):
         bake_button_row.operator(
             DLG_OP_BakeActions.bl_idname, text=f'Bake Actions')
 
-        debug_row = layout.row()
-        debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
-
-        layout.prop(context.object.pose.bones['PROPERTIES'], '["IK/FK"]')
-        layout.prop(context.object.pose.bones['PROPERTIES'], '["Retarget (Import)"]')
-        layout.prop(context.object.pose.bones['PROPERTIES'], '["Snap IK to FK"]')
+        # debug_row = layout.row()
+        # debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
 
 
 class DLG_UL_ActionList(UIList):
@@ -175,8 +196,16 @@ class DLG_OP_BakeActions(Operator):
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
+        old_props = {}
+        run_all_property_automations('_autoprop', old_props)
+        
         bake_selected_actions()
+
+        for bone in old_props:
+            run_property_automations_on_bone(bone, old_props[bone])
+
         deselect_all_actions(bpy.data.actions)
+
         return {'FINISHED'}
 
 
@@ -245,10 +274,6 @@ class DLG_OP_DebugTest(Operator):
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
-        deselect_all_bones()
-        select_target_bones(context.object)
-        print(context.object.pose.bones["PROPERTIES"]["IK/FK"])
-        print(context.object.pose.bones["PROPERTIES"]["_RNA_UI"])
         return {'FINISHED'}
 
 
