@@ -1,19 +1,20 @@
 import bpy
-from bpy.types import PropertyGroup, Action, Object, bpy_prop_collection, PoseBone, Context, Object
+from bpy.types import PropertyGroup, Action, PoseBone, Object
 from bpy.props import StringProperty, PointerProperty, CollectionProperty, BoolProperty, IntProperty
 from . import utils
-from typing import List
 
 
 class DlgActionGroupItem(PropertyGroup):
     action: PointerProperty(type=Action)
     is_selected: BoolProperty(default=False)
 
+
 class DlgTargetBone(PropertyGroup):
     name: StringProperty()
 
     def pose_bone(self, object: Object) -> PoseBone:
         return object.pose.bones[self.name]
+
 
 class DlgActionGroup(PropertyGroup):
     name: StringProperty(
@@ -47,6 +48,9 @@ class DlgSceneProperties(PropertyGroup):
 
     def get_selected_anim_group(self) -> DlgActionGroup:
         return self.anim_groups[self.anim_groups_index]
+
+    data_action_group_items: CollectionProperty(type=DlgActionGroupItem)
+    data_action_group_items_index: IntProperty()
 
     # NLA / Anim groups
     anim_groups: CollectionProperty(type=DlgActionGroup)

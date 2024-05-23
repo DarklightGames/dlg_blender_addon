@@ -27,16 +27,25 @@ def filter_actions_by_name(actions: bpy_prop_collection) -> List[int]:
     bitflag = pg.bitflag_filter_item
     use_filter_invert = pg.use_filter_invert
 
-    if filter_name:
-        return UI_UL_list.filter_items_by_name(filter_name, bitflag, actions, 'name', reverse=use_filter_invert)
+    filter_flags = [bitflag] * len(actions)
 
-    return [bitflag] * len(actions)
+    if filter_name:
+        filter_flags = UI_UL_list.filter_items_by_name(filter_name, bitflag, actions, 'name', reverse=use_filter_invert)
+
+    for (i, action) in enumerate(actions):
+        if action.library is not None or action.asset_data is not None:
+            filter_flags[i] &= ~bitflag
+
+    return filter_flags
 
 
 def select_visible_actions(actions: bpy_prop_collection) -> None:
     "Select all items visible in the action list. Selection on hidden items (filtered out) is preserved"
     filter_flags = filter_actions_by_name(actions=actions)
     for i, flag in enumerate(filter_flags):
+        # Do not select it if it is linked from another file.
+        if actions[i].asset_data is not None:
+            continue
         if not actions[i].dlg_is_selected:
             actions[i].dlg_is_selected = bool(
                 flag & bpy.context.scene.dlg_props.bitflag_filter_item)
@@ -73,8 +82,12 @@ def bake_action(action: Action) -> None:
 
 
 def bake_selected_actions() -> None:
-    for action in filter(lambda a: a.dlg_is_selected, bpy.data.actions):
+    actions_to_bake = list(filter(lambda a: a.dlg_is_selected, bpy.data.actions))
+    bpy.context.window_manager.progress_begin(0, len(actions_to_bake))
+    for i, action in enumerate(actions_to_bake):
         bake_action(action)
+        bpy.context.window_manager.progress_update(i)
+    bpy.context.window_manager.progress_end()
 
 
 def run_property_automations_on_bone(bone: PoseBone, autoprop_dict: Dict[str, Any], old_props: Dict[str, Any] = {}) -> None:
@@ -160,8 +173,7 @@ class DLG_PT_AnimationBaking(Panel):
 
         # Controls
         bake_button_row = layout.row()
-        bake_button_row.operator(
-            DLG_OP_BakeActions.bl_idname, text=f'Bake Actions')
+        bake_button_row.operator(DLG_OP_BakeActions.bl_idname, text=f'Bake Actions')
 
         # debug_row = layout.row()
         # debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
@@ -194,6 +206,13 @@ class DLG_OP_BakeActions(Operator):
     bl_idname = 'dlg_anim_bake.bake_actions'
     bl_label = 'Bakey Bakey'
     bl_options = {'INTERNAL', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene.dlg_props.source_armature is None:
+            cls.poll_message_set('No source armature selected')
+            return False
+        return True
 
     def execute(self, context):
         old_props = {}
