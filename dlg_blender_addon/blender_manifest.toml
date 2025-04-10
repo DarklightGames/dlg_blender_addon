@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+
+id = "dlg_blender_addon"
+version = "0.2.1"
+name = "Darklight Games Blender Tools"
+tagline = "A toolbox for animations"
+maintainer = "Yurii Ti <mooncats@tutanota.com>"
+type = "add-on"
+website = "https://github.com/DarklightGames/dlg_blender_addon"
+tags = ["Animation"]
+blender_version_min = "4.2.0"
+license = [
+  "SPDX:GPL-3.0-or-later",
+]

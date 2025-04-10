@@ -1,16 +1,3 @@
-bl_info = {
-    "name": "Darklight Games Blender Tools",
-    "author": "Colin Basnett, Yurii Tinianskyi",
-    "version": (0, 2, 0),
-    "blender": (3, 0, 0),
-    # "location": "File > Export > PSK Export (.psk)",
-    "description": "Darklight Games Blender Tools",
-    "warning": "",
-    "doc_url": "https://github.com/DarklightGames/dlg_blender_addon",
-    "tracker_url": "https://github.com/DarklightGames/dlg_blender_addon/issues",
-    "category": "Animation"
-}
-
 if 'bpy' in locals():
     import importlib
     importlib.reload(dlg_props)
