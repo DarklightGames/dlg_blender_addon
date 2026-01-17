@@ -3,22 +3,26 @@ from bpy.types import Action, UIList, Panel, Operator, UI_UL_list, bpy_prop_coll
 from typing import List, Dict, Any
 
 
+def set_pose_bone_selection(pose_bone: PoseBone, value: bool) -> None:
+    if not pose_bone:
+        return
+
+    if bpy.app.version < (5, 0, 0):
+        pose_bone.bone.select = value
+    else:
+        pose_bone.select = value
+
+
 def deselect_all_bones() -> None:
     for pose_bone in bpy.context.selected_pose_bones:
-        pose_bone.bone.select = False
-
-
-def select_bone(object: Object, name: str) -> None:
-    pose_bone = object.pose.bones[name]
-    if pose_bone:
-        pose_bone.bone.select = True
+        set_pose_bone_selection(pose_bone, False)
 
 
 def select_target_bones(object: Object) -> None:
     pg = bpy.context.scene.dlg_props
 
-    for bone in pg.target_bones:
-        select_bone(object, bone.name)
+    for target_bone in pg.target_bones:
+        set_pose_bone_selection(target_bone.pose_bone(object), True)
 
 
 def filter_actions_by_name(actions: bpy_prop_collection) -> List[int]:
