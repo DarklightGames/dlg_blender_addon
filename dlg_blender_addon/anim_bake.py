@@ -57,17 +57,27 @@ def deselect_all_actions(actions: bpy_prop_collection) -> None:
         act.dlg_is_selected = False
 
 
+def set_action(object: Object, action: Action) -> None:
+    anim_data = object.animation_data
+    anim_data.action = action
+
+    if hasattr(anim_data, 'action_slot'):
+        anim_data.action_slot = anim_data.action_suitable_slots[0]
+
+
 def bake_action(action: Action) -> None:
     print('Baking {}'.format(action.name))
 
-    pg = bpy.context.scene.dlg_props
-    source_ao = pg.source_armature
-    target_ao = bpy.context.object
-    source_ao.animation_data.action = target_ao.animation_data.action = action
+    source_obj = bpy.context.scene.dlg_props.source_armature
+    target_obj = bpy.context.object
+
     action_frame_start, action_frame_end = action.frame_range
 
+    set_action(source_obj, action)
+    set_action(target_obj, action)
+
     deselect_all_bones()
-    select_target_bones(target_ao)
+    select_target_bones(target_obj)
 
     bpy.ops.nla.bake(frame_start=int(action_frame_start),
                      frame_end=int(action_frame_end),
