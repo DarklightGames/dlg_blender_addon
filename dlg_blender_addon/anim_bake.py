@@ -196,7 +196,7 @@ class DLG_PT_AnimationBaking(Panel):
         selection_row = layout.row(align=True)
         selection_row.label(text=f'Select')
         selection_row.operator(
-            DLG_OP_SelectVisibleActions.bl_idname, text=f'All', icon='CHECKBOX_HLT')
+            DLG_OP_SelectVisibleActions.bl_idname, text=f'Visible', icon='CHECKBOX_HLT')
         selection_row.operator(
             DLG_OP_DeselectAllActions.bl_idname, text=f'None', icon='CHECKBOX_DEHLT')
 
@@ -216,8 +216,7 @@ class DLG_PT_AnimationBaking(Panel):
 class DLG_UL_ActionList(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         layout.alignment = 'LEFT'
-        layout.prop(item, 'dlg_is_selected', icon_only=True)
-        layout.label(text=item.name)
+        layout.prop(item, 'dlg_is_selected', icon_only=True, text=item.name)
 
     def draw_filter(self, context, layout):
         pg = context.scene.dlg_props
@@ -239,6 +238,7 @@ class DLG_UL_ActionList(UIList):
 class DLG_OP_BakeActions(Operator):
     bl_idname = 'dlg_anim_bake.bake_actions'
     bl_label = 'Bakey Bakey'
+    bl_description = 'Transfer animations to targetted bones'
     bl_options = {'INTERNAL', 'UNDO'}
 
     @classmethod
@@ -269,7 +269,8 @@ class DLG_OP_BakeActions(Operator):
 
 class DLG_OP_SelectVisibleActions(Operator):
     bl_idname = 'dlg_anim_bake.select_visible_actions'
-    bl_label = 'Select All'
+    bl_label = 'Select All Visible'
+    bl_description = 'Select all visible actions'
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):
@@ -280,6 +281,7 @@ class DLG_OP_SelectVisibleActions(Operator):
 class DLG_OP_DeselectAllActions(Operator):
     bl_idname = 'dlg_anim_bake.deselect_all_actions'
     bl_label = 'Select None'
+    bl_description = 'Deselect all actions (including hidden)'
     bl_options = {'INTERNAL', 'UNDO'}
 
     def execute(self, context):

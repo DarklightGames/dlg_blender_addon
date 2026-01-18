@@ -47,26 +47,35 @@ class DlgSceneProperties(PropertyGroup):
 
     # NLA / Anim groups
     anim_groups: CollectionProperty(type=DlgActionGroup)
-    anim_groups_index: IntProperty(
-        name='Active Action Group')
+    anim_groups_index: IntProperty(name='Active Action Group')
 
     # Markers
     use_action_names_for_markers: BoolProperty(
         default=False,
         name='Use Action Names',
         description='Use names of referenced actions instead of strip names')
+
     marker_name_replace: StringProperty(name='Replace')
     marker_name_replace_with: StringProperty(name='With')
 
     # Action Bake
-    action_index: IntProperty(default=0)
-    filter_name: StringProperty(options={'TEXTEDIT_UPDATE'})
+    action_index: IntProperty(default=0,
+                              name='Active Action Index')
+
+    filter_name: StringProperty(options={'TEXTEDIT_UPDATE'},
+                                name='Filter by Name',
+                                description='Only show items matching this name (use \'*\' as wildcard)')
+
     bitflag_filter_item = 1 << 30
     only_selected_bones: BoolProperty(default=True)
     visual_keying: BoolProperty(default=True)
     overwrite_current_action: BoolProperty(default=True)
     clean_curves: BoolProperty(default=True)
-    use_filter_invert: BoolProperty(default=False, options={'TEXTEDIT_UPDATE'})
+
+    use_filter_invert: BoolProperty(default=False,
+                                    options={'TEXTEDIT_UPDATE'},
+                                    name='Invert',
+                                    description='Invert filtering (show hidden items, and vice versa)')
 
     source_armature: PointerProperty(type=Object,
                                      poll=utils.is_armature_poll,
