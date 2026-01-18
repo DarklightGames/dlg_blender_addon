@@ -69,13 +69,36 @@ def set_action(object: Object, action: Action) -> None:
         anim_data.action_slot = anim_data.action_suitable_slots[0]
 
 
+def mute_nla_tracks(object: Object) -> dict[str, bool]:
+    "Mute all NLA tracks and return previous mute state."
+    mute_state = {}
+
+    for track in object.animation_data.nla_tracks:
+        mute_state.update({track.name: track.mute})
+        track.mute = True
+
+    return mute_state
+
+
+def apply_nla_mute_state(object: Object, mute_state: dict[str, bool]):
+    "Mute/unmute NLA tracks from a dictionary"
+
+    tracks = object.animation_data.nla_tracks
+    for track in tracks:
+        try:
+            track.mute = mute_state[track.name]
+        except KeyError:
+            pass
+
+
 def bake_action(action: Action) -> None:
     print('Baking {}'.format(action.name))
 
     source_obj = bpy.context.scene.dlg_props.source_armature
     target_obj = bpy.context.object
-
     action_frame_start, action_frame_end = action.frame_range
+
+    mute_state = mute_nla_tracks(target_obj)
 
     set_action(source_obj, action)
     set_action(target_obj, action)
@@ -93,6 +116,8 @@ def bake_action(action: Action) -> None:
                      use_current_action=True,
                      clean_curves=True,
                      bake_types={'POSE'})
+
+    apply_nla_mute_state(target_obj, mute_state)
 
 
 def bake_selected_actions() -> None:
