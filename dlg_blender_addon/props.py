@@ -9,13 +9,6 @@ class DlgActionGroupItem(PropertyGroup):
     is_selected: BoolProperty(default=False)
 
 
-class DlgTargetBone(PropertyGroup):
-    name: StringProperty()
-
-    def pose_bone(self, object: Object) -> PoseBone:
-        return object.pose.bones[self.name]
-
-
 class DlgActionGroup(PropertyGroup):
     name: StringProperty(
         default='AnimGroup',
@@ -66,7 +59,6 @@ class DlgSceneProperties(PropertyGroup):
     marker_name_replace_with: StringProperty(name='With')
 
     # Action Bake
-    target_bones: CollectionProperty(type=DlgTargetBone)
     action_index: IntProperty(default=0)
     filter_name: StringProperty(options={'TEXTEDIT_UPDATE'})
     bitflag_filter_item = 1 << 30
@@ -75,7 +67,15 @@ class DlgSceneProperties(PropertyGroup):
     overwrite_current_action: BoolProperty(default=True)
     clean_curves: BoolProperty(default=True)
     use_filter_invert: BoolProperty(default=False, options={'TEXTEDIT_UPDATE'})
-    source_armature: PointerProperty(type=Object, poll=utils.is_armature_poll)
+
+    source_armature: PointerProperty(type=Object,
+                                     poll=utils.is_armature_poll,
+                                     name='Source Armature',
+                                     description='Armature to transfer animations from')
+
+    target_bone_collection: StringProperty(default='RETARGET',
+                                           name='Target Bone Collection',
+                                           description='Bone collection to target for baking')
 
 
 __classes__ = [

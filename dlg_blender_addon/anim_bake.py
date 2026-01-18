@@ -18,11 +18,18 @@ def deselect_all_bones() -> None:
         set_pose_bone_selection(pose_bone, False)
 
 
-def select_target_bones(object: Object) -> None:
+def select_bone_collection(object: Object, collection_name: str) -> None:
+    "Select all bones in a collection recursively (including child collections)"
     pg = bpy.context.scene.dlg_props
 
-    for target_bone in pg.target_bones:
-        set_pose_bone_selection(target_bone.pose_bone(object), True)
+    try:
+        bone_collection = object.data.collections_all[collection_name]
+    except KeyError:
+        return
+
+    for bone in bone_collection.bones_recursive:
+        pose_bone = object.pose.bones[bone.name]
+        set_pose_bone_selection(pose_bone, True)
 
 
 def filter_actions_by_name(actions: bpy_prop_collection) -> List[int]:
@@ -94,7 +101,8 @@ def apply_nla_mute_state(object: Object, mute_state: dict[str, bool]):
 def bake_action(action: Action) -> None:
     print('Baking {}'.format(action.name))
 
-    source_obj = bpy.context.scene.dlg_props.source_armature
+    pg = bpy.context.scene.dlg_props
+    source_obj = pg.source_armature
     target_obj = bpy.context.object
     action_frame_start, action_frame_end = action.frame_range
 
@@ -104,7 +112,7 @@ def bake_action(action: Action) -> None:
     set_action(target_obj, action)
 
     deselect_all_bones()
-    select_target_bones(target_obj)
+    select_bone_collection(target_obj, pg.target_bone_collection)
 
     bpy.ops.nla.bake(frame_start=int(action_frame_start),
                      frame_end=int(action_frame_end),
@@ -168,32 +176,19 @@ class DLG_PT_AnimationBaking(Panel):
         scene = context.scene
         pg = scene.dlg_props
         ob = context.object
+        label_split_factor = 0.34
 
         # Source/target armature objects
-        ao_split = layout.split(factor=0.2)
-        ao_left_col = ao_split.column()
-        ao_left_col.label(text=f'Source')
-        ao_right_col = ao_split.column()
-        ao_right_col.prop_search(
+        ao_split = layout.split(factor=label_split_factor)
+        ao_left_col = ao_split.column().label(text=f'Source Armature')
+        ao_right_col = ao_split.column().prop_search(
             pg, 'source_armature', context.scene, 'objects', text='', icon='OUTLINER_OB_ARMATURE')
 
-        layout.separator()
-
         # Bones
-        selected_pose_bones = context.selected_pose_bones
-        pose_bones = ob.pose.bones
-        
-        layout.label(text='Target Bones: {}'.format(len(pg.target_bones)), icon='BONE_DATA')
-
-        set_bones_row = layout.row(align=True)
-        set_bones_row.operator(
-            DLG_OP_AddTargetBones.bl_idname, 
-            text='Add ({})'.format(len(selected_pose_bones)), 
-            icon='ADD')
-        set_bones_row.operator(
-            DLG_OP_ClearTargetBones.bl_idname, 
-            text='Clear', 
-            icon='REMOVE')
+        bones_split = layout.split(factor=label_split_factor)
+        bones_left_col = bones_split.column().label(text=f'Target Bones')
+        bones_right_col = bones_split.column().prop_search(
+            pg, 'target_bone_collection', ob.data, 'collections_all', text='', icon='GROUP_BONE')
 
         layout.separator()
 
@@ -251,6 +246,11 @@ class DLG_OP_BakeActions(Operator):
         if context.scene.dlg_props.source_armature is None:
             cls.poll_message_set('No source armature selected')
             return False
+
+        if not context.scene.dlg_props.target_bone_collection in context.object.data.collections_all:
+            cls.poll_message_set('No valid bone collection selected')
+            return False
+
         return True
 
     def execute(self, context):
