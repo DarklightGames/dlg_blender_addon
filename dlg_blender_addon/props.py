@@ -88,7 +88,6 @@ class DlgSceneProperties(PropertyGroup):
 
 
 __classes__ = [
-    DlgTargetBone,
     DlgActionGroupItem,
     DlgActionGroup,
     DlgSceneProperties
