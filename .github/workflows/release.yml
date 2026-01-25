@@ -33,7 +33,7 @@ jobs:
           exit 1
         fi
         echo "MANIFEST_PATH=${{ env.ADDON_NAME }}/blender_manifest.toml" >> "$GITHUB_ENV"
-        echo "ARTIFACT_NAME=${{ env.ADDON_NAME}}-${{ env.VERSION }}.zip" >> "$GITHUB_ENV"
+        echo "ARTIFACT_NAME=${{ env.ADDON_NAME}}-${{ env.VERSION }}" >> "$GITHUB_ENV"
 
     - name: Checkout
       uses: actions/checkout@v6
@@ -93,16 +93,14 @@ jobs:
         git checkout tags/${{ github.event.inputs.version }}
 
     - name: Archive release
-      uses: thedoctor0/zip-release@0.7.6
-      with:
-        type: 'zip'
-        filename: ${{ env.ARTIFACT_NAME }}
-        path: '${{ env.ADDON_NAME }}/'
+      run: |
+        cd ${{ env.ADDON_NAME }}
+        zip -r ../${{ env.ARTIFACT_NAME }}.zip .
 
     - name: Upload release
       uses: ncipollo/release-action@v1.20.0
       with:
-        artifacts: ${{ env.ARTIFACT_NAME }}
+        artifacts: ${{ env.ARTIFACT_NAME }}.zip
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ env.VERSION }}
         draft: ${{ github.event.inputs.draft }}
