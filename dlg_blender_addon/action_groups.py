@@ -53,6 +53,7 @@ class DLG_OP_AddActionGroup(Operator):
     def execute(self, context):
         props = context.scene.dlg_props
         props.anim_groups.add()
+        props.anim_groups_index = len(props.anim_groups) - 1
 
         return {'FINISHED'}
 
@@ -62,9 +63,20 @@ class DLG_OP_RemoveActionGroup(Operator):
     bl_label = 'Remove Animation Group'
     bl_options = {'INTERNAL', 'UNDO'}
 
+    @classmethod
+    def poll(cls, context):
+        if not context.scene.dlg_props.is_anim_group_selected():
+            cls.poll_message_set('No action group selected')
+            return False
+
+        return True
+
     def execute(self, context):
         props = context.scene.dlg_props
         props.anim_groups.remove(props.anim_groups_index)
+
+        if props.anim_groups_index >= len(props.anim_groups):
+            props.anim_groups_index = len(props.anim_groups) - 1
 
         return {'FINISHED'}
 
@@ -79,9 +91,15 @@ class DLG_OP_PushDownActionGroup(Operator):
         if context.object is None:
             cls.poll_message_set('No object selected')
             return False
+
         if context.active_nla_track is None:
             cls.poll_message_set('No NLA track selected')
             return False
+
+        if not context.scene.dlg_props.is_anim_group_selected():
+            cls.poll_message_set('No action group selected')
+            return False
+
         return True
 
     def execute(self, context):
