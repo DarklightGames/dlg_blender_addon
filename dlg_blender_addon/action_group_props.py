@@ -17,12 +17,16 @@ def filter_sequences(filter_name: str, items) -> List[int]:
     return flt_flags
 
 
-class DLG_UL_ActionListLeft(UIList):
+class UIActionList(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        layout.alignment = 'LEFT'
-        layout.prop(item, 'is_selected', text='')
-        layout.label(text=item.action.name)
+        split = layout.split(align=True, factor=1.0)
+        column = split.row(align=True)
+        column.alignment = 'LEFT'
+        column.prop(item, 'is_selected', icon_only=True)
+        column.label(text=item.action.name)
 
+
+class DLG_UL_ActionListLeft(UIActionList):
     def filter_items(self, context, data, prop):
         pg = context.scene.dlg_props
         items = pg.data_action_group_items
@@ -31,11 +35,8 @@ class DLG_UL_ActionListLeft(UIList):
         return flt_flags, flt_neworder
 
 
-class DLG_UL_ActionListRight(UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        layout.alignment = 'LEFT'
-        layout.prop(item, 'is_selected', text='')
-        layout.label(text=item.action.name)
+class DLG_UL_ActionListRight(UIActionList):
+    pass
 
 
 class DLG_OP_EditActionGroup(Operator):
