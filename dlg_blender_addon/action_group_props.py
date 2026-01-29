@@ -44,6 +44,14 @@ class DLG_OP_EditActionGroup(Operator):
     bl_label = 'Edit Action Group'
     bl_options = {'INTERNAL', 'UNDO'}
 
+    @classmethod
+    def poll(cls, context):
+        if not context.scene.dlg_props.is_anim_group_selected():
+            cls.poll_message_set('No action group selected')
+            return False
+
+        return True
+
     def execute(self, context):
         return {'FINISHED'}
 

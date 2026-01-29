@@ -50,6 +50,9 @@ class DlgSceneProperties(PropertyGroup):
     def get_selected_anim_group(self) -> DlgActionGroup:
         return self.anim_groups[self.anim_groups_index]
 
+    def is_anim_group_selected(self) -> bool:
+        return 0 <= self.anim_groups_index < len(self.anim_groups)
+
     data_action_group_items: CollectionProperty(type=DlgActionGroupItem)
     data_action_group_items_index: IntProperty()
 
