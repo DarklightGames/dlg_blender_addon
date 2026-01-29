@@ -20,7 +20,8 @@ def filter_sequences(filter_name: str, items) -> List[int]:
 class DLG_UL_ActionListLeft(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         layout.alignment = 'LEFT'
-        layout.prop(item, 'is_selected', text=item.action.name)
+        layout.prop(item, 'is_selected', text='')
+        layout.label(text=item.action.name)
 
     def filter_items(self, context, data, prop):
         pg = context.scene.dlg_props
@@ -33,7 +34,8 @@ class DLG_UL_ActionListLeft(UIList):
 class DLG_UL_ActionListRight(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         layout.alignment = 'LEFT'
-        layout.prop(item, 'is_selected', text=item.action.name)
+        layout.prop(item, 'is_selected', text='')
+        layout.label(text=item.action.name)
 
 
 class DLG_OP_EditActionGroup(Operator):
@@ -78,6 +80,9 @@ class DLG_OP_EditActionGroup(Operator):
 
         control_col.operator(DLG_OP_AddActionToGroup.bl_idname, text='', icon='TRIA_RIGHT')
         control_col.operator(DLG_OP_RemoveActionFromGroup.bl_idname, text='', icon='TRIA_LEFT')
+        control_col.separator()
+        control_col.operator(DLG_OP_MoveActionUp.bl_idname, text='', icon='TRIA_UP')
+        control_col.operator(DLG_OP_MoveActionDown.bl_idname, text='', icon='TRIA_DOWN')
 
         right_col = row.column()
         right_col.template_list('DLG_UL_ActionListRight', '', anim_group,
@@ -139,7 +144,47 @@ class DLG_OP_RemoveActionFromGroup(Operator):
             if item.is_selected:
                 pg.data_action_group_items.add().action = item.action
                 action_group.actions.remove(i)
-        
+
+        return {'FINISHED'}
+
+
+class DLG_OP_MoveActionUp(Operator):
+    bl_idname = 'dlg_action_groups.move_action_up'
+    bl_label = 'Move Action Up'
+    bl_options = {'INTERNAL', 'UNDO'}
+
+    @classmethod
+    def poll(self, context):
+        action_group = context.scene.dlg_props.get_selected_anim_group()
+        return bool(action_group.actions) and action_group.actions_index_right - 1 >= 0
+
+    def execute(self, context):
+        pg = context.scene.dlg_props
+        action_group = pg.get_selected_anim_group()
+        action_group.move_action_up(action_group.actions_index_right)
+
+        return {'FINISHED'}
+
+
+class DLG_OP_MoveActionDown(Operator):
+    bl_idname = 'dlg_action_groups.move_action_down'
+    bl_label = 'Move Action Down'
+    bl_options = {'INTERNAL', 'UNDO'}
+
+    @classmethod
+    def poll(self, context):
+        try:
+            action_group = context.scene.dlg_props.get_selected_anim_group()
+            action_group.actions[action_group.actions_index_right + 1]
+            return True
+        except IndexError:
+            return False
+
+    def execute(self, context):
+        pg = context.scene.dlg_props
+        action_group = pg.get_selected_anim_group()
+        action_group.move_action_down(action_group.actions_index_right)
+
         return {'FINISHED'}
 
 
@@ -148,5 +193,7 @@ __classes__ = [
     DLG_UL_ActionListLeft,
     DLG_UL_ActionListRight,
     DLG_OP_AddActionToGroup,
-    DLG_OP_RemoveActionFromGroup
+    DLG_OP_RemoveActionFromGroup,
+    DLG_OP_MoveActionUp,
+    DLG_OP_MoveActionDown
 ]

@@ -36,6 +36,14 @@ class DlgActionGroup(PropertyGroup):
         # TODO: Make sure list is not empty
         return self.actions[self.actions_index_right].action
 
+    def move_action_up(self, index) -> None:
+        self.actions.move(index, index - 1)
+        self.actions_index_right = max(0, self.actions_index_right - 1)
+
+    def move_action_down(self, index) -> None:
+        self.actions.move(index, index + 1)
+        self.actions_index_right = min(max(0, len(self.actions) - 1), self.actions_index_right + 1)
+
 
 class DlgSceneProperties(PropertyGroup):
 
