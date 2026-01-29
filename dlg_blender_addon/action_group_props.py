@@ -74,13 +74,12 @@ class DLG_OP_EditActionGroup(Operator):
     def draw(self, context):
         pg = context.scene.dlg_props
         anim_group = pg.get_selected_anim_group()
-
         layout = self.layout
-        layout.prop(anim_group, 'name')
-        layout.prop(anim_group, 'gap_frames')
 
+        self.text = 'foo'
+
+        # ACTION LISTS
         row = layout.row()
-
         left_col = row.column()
         left_col.template_list('DLG_UL_ActionListLeft', '', pg,
                                'data_action_group_items', pg, 'data_action_group_items_index', rows=10)
@@ -96,6 +95,17 @@ class DLG_OP_EditActionGroup(Operator):
         right_col = row.column()
         right_col.template_list('DLG_UL_ActionListRight', '', anim_group,
                                 'actions', anim_group, 'actions_index_right', rows=10)
+
+        layout.separator()
+
+        # PROPERTIES
+        col = layout.column(align=True)
+        col.use_property_split = True
+        col.use_property_decorate = False
+        col.prop(anim_group, 'name')
+        col.prop(anim_group, 'gap_frames')
+
+        layout.separator()
 
 
 class DLG_OP_AddActionToGroup(Operator):

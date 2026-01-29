@@ -11,13 +11,14 @@ class DlgActionGroupItem(PropertyGroup):
 
 class DlgActionGroup(PropertyGroup):
     name: StringProperty(
-        default='AnimGroup',
-        name='Name')
+        default='Actions',
+        name='Group Name')
 
     gap_frames: IntProperty(
         default=1,
-        name='Gap Frames',
-        description='Size of the gap between strips')
+        soft_min=0,
+        name='Spacing',
+        description='The amount of frames to leave in between added strips')
 
     actions_index_left: IntProperty(
         name='Active Actions Index')
