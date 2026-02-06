@@ -1,15 +1,19 @@
 import bpy
-from bpy.types import PropertyGroup, Action, PoseBone, Object
+from bpy.types import PropertyGroup, Action, PoseBone, Object, Context
 from bpy.props import StringProperty, PointerProperty, CollectionProperty, BoolProperty, IntProperty
-from . import utils
+from .utils import is_armature_poll
+# from . import utils
+
+from typing import cast, Any
+from fnmatch import fnmatch
 
 
-class DlgActionGroupItem(PropertyGroup):
+class DLG_PG_action_group_item(PropertyGroup):
     action: PointerProperty(type=Action)
     is_selected: BoolProperty(default=False)
 
 
-class DlgActionGroup(PropertyGroup):
+class DLG_PG_action_group(PropertyGroup):
     name: StringProperty(
         default='Actions',
         name='Group Name')
@@ -26,15 +30,13 @@ class DlgActionGroup(PropertyGroup):
     actions_index_right: IntProperty(
         name='Active Grouped Actions Index')
 
-    actions: CollectionProperty(type=DlgActionGroupItem)
+    actions: CollectionProperty(type=DLG_PG_action_group_item)
 
+    def get_active_action_left(self) -> Action:
+        action: Action = cast(Action, bpy.data.actions[self.actions_index_left])
+        return action
 
-    def get_selected_action_left(self) -> Action:
-        # TODO: Make sure list is not empty
-        return bpy.data.actions[self.actions_index_left]
-
-    def get_selected_action_right(self) -> Action:
-        # TODO: Make sure list is not empty
+    def get_active_action_right(self) -> Action:
         return self.actions[self.actions_index_right].action
 
     def move_action_up(self, index) -> None:
@@ -46,19 +48,21 @@ class DlgActionGroup(PropertyGroup):
         self.actions_index_right = min(max(0, len(self.actions) - 1), self.actions_index_right + 1)
 
 
-class DlgSceneProperties(PropertyGroup):
+class DLG_PG_scene_properties(PropertyGroup):
 
-    def get_selected_anim_group(self) -> DlgActionGroup:
+    def get_selected_anim_group(self) -> DLG_PG_action_group:
+        groups = cast(DLG_PG_action_group, self.anim_groups[self.anim_groups_index])
+
         return self.anim_groups[self.anim_groups_index]
 
     def is_anim_group_selected(self) -> bool:
         return 0 <= self.anim_groups_index < len(self.anim_groups)
 
-    data_action_group_items: CollectionProperty(type=DlgActionGroupItem)
+    data_action_group_items: CollectionProperty(type=DLG_PG_action_group_item)
     data_action_group_items_index: IntProperty()
 
     # NLA / Anim groups
-    anim_groups: CollectionProperty(type=DlgActionGroup)
+    anim_groups: CollectionProperty(type=DLG_PG_action_group)
     anim_groups_index: IntProperty(name='Active Action Group')
 
     # Markers
@@ -90,7 +94,7 @@ class DlgSceneProperties(PropertyGroup):
                                     description='Invert filtering (show hidden items, and vice versa)')
 
     source_armature: PointerProperty(type=Object,
-                                     poll=utils.is_armature_poll,
+                                     poll=is_armature_poll,
                                      name='Source Armature',
                                      description='Armature to transfer animations from')
 
@@ -99,8 +103,28 @@ class DlgSceneProperties(PropertyGroup):
                                            description='Bone collection to target for baking')
 
 
-__classes__ = [
-    DlgActionGroupItem,
-    DlgActionGroup,
-    DlgSceneProperties
-]
+def get_scene_properties(context: Context) -> DLG_PG_scene_properties:
+    return getattr(context.scene, 'dlg_props')
+
+
+def filter_actions(filter_name: str, items: list[Any]) -> list[int]:
+    bitflag_filter_item = 1 << 30
+    flt_flags = [bitflag_filter_item] * len(items)
+
+    if filter_name:
+        for i, item in enumerate(items):
+            if not fnmatch(item.action.name, f'*{filter_name}*'):
+                flt_flags[i] &= ~bitflag_filter_item
+
+    return flt_flags
+
+
+_classes= (
+    DLG_PG_action_group_item,
+    DLG_PG_action_group,
+    DLG_PG_scene_properties
+)
+
+
+from bpy.utils import register_classes_factory
+register, unregister = register_classes_factory(_classes)

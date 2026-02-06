@@ -1,0 +1,9 @@
+[tool.pyright]
+reportInvalidTypeForm = false
+reportUninitializedInstanceVariable = false
+reportUnannotatedClassAttribute = false
+reportUnusedCallResult = false
+reportExplicitAny = false
+reportAny = false
+reportMissingParameterType = false
+reportImplicitOverride = false
