@@ -162,8 +162,8 @@ def run_all_property_automations(autoprop_dict_name: str, old_props: dict[PoseBo
 
 class DLG_OT_actions_retarget(Operator):
     bl_idname = 'dlg_retarget.actions_retarget'
-    bl_label = 'Bakey Bakey'
-    bl_description = 'Transfer animations to targetted bones'
+    bl_label = 'Retarget Selected Actions'
+    bl_description = 'Transfer animations from a source armature to targetted bones'
     bl_options = {'INTERNAL', 'UNDO'}
 
     @classmethod

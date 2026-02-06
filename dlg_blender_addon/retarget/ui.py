@@ -8,8 +8,8 @@ class DLG_PT_retarget(Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = 'data'
-    bl_category = 'Darklight Animation Baker'
-    bl_label = 'Darklight Animation Baker'
+    bl_category = 'Retarget Actions (DLG)'
+    bl_label = 'Retarget Actions (DLG)'
     bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
@@ -52,7 +52,7 @@ class DLG_PT_retarget(Panel):
 
         # Controls
         bake_button_row = layout.row()
-        bake_button_row.operator(ops.DLG_OT_actions_retarget.bl_idname, text=f'Bake Actions')
+        bake_button_row.operator(ops.DLG_OT_actions_retarget.bl_idname, text=f'Retarget')
 
         # debug_row = layout.row()
         # debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
