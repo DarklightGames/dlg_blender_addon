@@ -84,7 +84,7 @@ jobs:
 
       - name: Create tag and push
         id: tag-and-push
-        if: steps.commit.outcome != 'skipped'
+        if: steps.does-tag-exist.outputs.result == 'false'
         run: |
           git tag ${{ env.VERSION }}
           git push origin ${{ github.ref_name }} --tags
