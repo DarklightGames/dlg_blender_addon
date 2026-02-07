@@ -1,9 +1,9 @@
 schema_version = "1.0.0"
 
 id = "dlg_blender_addon"
-version = "0.3.1"
+version = "0.4.0"
 name = "Darklight Games Blender Tools"
-tagline = "A toolbox for animations"
+tagline = "A collection of animation tools"
 maintainer = "Yurii Ti <mooncats@tutanota.com>"
 type = "add-on"
 website = "https://github.com/DarklightGames/dlg_blender_addon"
