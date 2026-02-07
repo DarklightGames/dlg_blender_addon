@@ -110,10 +110,15 @@ class DLG_PT_markers(Panel):
         props = context.scene.dlg_props
         layout = self.layout
 
-        layout.prop(props, 'use_action_names_for_markers')
-        layout.prop(props, 'marker_name_replace')
-        layout.prop(props, 'marker_name_replace_with')
-        layout.separator()
+        col = layout.column(align=True)
+        col.use_property_split = True
+        col.use_property_decorate = False
+        col.prop(props, 'marker_name_replace')
+        col.prop(props, 'marker_name_replace_with')
+        col.separator()
+        col.prop(props, 'use_action_names_for_markers')
+        col.separator()
+
         col = layout.column(align=True)
         col.operator(ops.DLG_OT_markers_push_tracks.bl_idname, icon='SEQ_STRIP_DUPLICATE')
         col.operator(ops.DLG_OT_markers_push_strips.bl_idname, icon='SEQ_STRIP_META')

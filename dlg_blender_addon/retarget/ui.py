@@ -21,19 +21,15 @@ class DLG_PT_retarget(Panel):
         scene = context.scene
         pg = scene.dlg_props
         ob = context.object
-        label_split_factor = 0.34
 
-        # Source/target armature objects
-        ao_split = layout.split(factor=label_split_factor)
-        ao_left_col = ao_split.column().label(text=f'Source Armature')
-        ao_right_col = ao_split.column().prop_search(
-            pg, 'source_armature', context.scene, 'objects', text='', icon='OUTLINER_OB_ARMATURE')
-
-        # Bones
-        bones_split = layout.split(factor=label_split_factor)
-        bones_left_col = bones_split.column().label(text=f'Target Bones')
-        bones_right_col = bones_split.column().prop_search(
-            pg, 'target_bone_collection', ob.data, 'collections_all', text='', icon='GROUP_BONE')
+        # Properties
+        col = layout.column(align=True)
+        col.use_property_split = True
+        col.use_property_decorate = False
+        col.prop_search(
+            pg, 'source_armature', context.scene, 'objects', icon='OUTLINER_OB_ARMATURE')
+        col.prop_search(
+            pg, 'target_bone_collection', ob.data, 'collections_all', icon='GROUP_BONE')
 
         layout.separator()
 

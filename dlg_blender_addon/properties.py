@@ -99,8 +99,8 @@ class DLG_PG_scene_properties(PropertyGroup):
                                      description='Armature to transfer animations from')
 
     target_bone_collection: StringProperty(default='RETARGET',
-                                           name='Target Bone Collection',
-                                           description='Animations will be tranferred from source armature onto the selected Bone Collection')
+                                           name='Bone Collection',
+                                           description='Bone Collection to target on this armature. Animations will be tranferred from source armature onto the selected Bone Collection')
 
 
 def get_scene_properties(context: Context) -> DLG_PG_scene_properties:
