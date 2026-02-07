@@ -114,8 +114,9 @@ class DLG_PT_markers(Panel):
         layout.prop(props, 'marker_name_replace')
         layout.prop(props, 'marker_name_replace_with')
         layout.separator()
-        layout.operator(ops.DLG_OT_markers_push_tracks.bl_idname, icon='SEQ_STRIP_DUPLICATE')
-        layout.operator(ops.DLG_OT_markers_push_strips.bl_idname, icon='SEQ_STRIP_META')
+        col = layout.column(align=True)
+        col.operator(ops.DLG_OT_markers_push_tracks.bl_idname, icon='SEQ_STRIP_DUPLICATE')
+        col.operator(ops.DLG_OT_markers_push_strips.bl_idname, icon='SEQ_STRIP_META')
         layout.operator(ops.DLG_OT_markers_clear_all.bl_idname, text='Clear All', icon='TRASH')
 
 
