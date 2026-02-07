@@ -160,7 +160,7 @@ def run_all_property_automations(autoprop_dict_name: str, old_props: dict[PoseBo
             pass
 
 
-class DLG_OT_actions_retarget(Operator):
+class DLG_OT_retarget_actions_apply(Operator):
     bl_idname = 'dlg_retarget.actions_retarget'
     bl_label = 'Retarget Selected Actions'
     bl_description = 'Transfer animations from a source armature to targetted bones'
@@ -192,7 +192,7 @@ class DLG_OT_actions_retarget(Operator):
         return {'FINISHED'}
 
 
-class DLG_OT_actions_select_visible(Operator):
+class DLG_OT_retarget_actions_select_visible(Operator):
     bl_idname = 'dlg_retarget.actions_select_visible'
     bl_label = 'Select All Visible'
     bl_description = 'Select all visible actions'
@@ -203,7 +203,7 @@ class DLG_OT_actions_select_visible(Operator):
         return {'FINISHED'}
 
 
-class DLG_OT_actions_deselect_all(Operator):
+class DLG_OT_retarget_actions_deselect_all(Operator):
     bl_idname = 'dlg_retarget.actions_deselect_all'
     bl_label = 'Select None'
     bl_description = 'Deselect all actions (including hidden)'
@@ -214,6 +214,8 @@ class DLG_OT_actions_deselect_all(Operator):
         return {'FINISHED'}
 
 
+# TODO: Add option to select individual bones in the future.
+# DEPRECATED
 class DLG_OP_target_bones_add(Operator):
     bl_idname = 'dlg_retarget.target_bones_add'
     bl_label = 'Add Target Bones'
@@ -239,6 +241,7 @@ class DLG_OP_target_bones_add(Operator):
         return {'FINISHED'}
 
 
+# DEPRECATED
 class DLG_OT_target_bones_clear(Operator):
     bl_idname = 'dlg_retarget.target_bones_clear'
     bl_label = 'Clear Target Bones'
@@ -256,9 +259,9 @@ class DLG_OT_target_bones_clear(Operator):
 _classes = (
     DLG_OP_target_bones_add,
     DLG_OT_target_bones_clear,
-    DLG_OT_actions_retarget,
-    DLG_OT_actions_select_visible,
-    DLG_OT_actions_deselect_all
+    DLG_OT_retarget_actions_apply,
+    DLG_OT_retarget_actions_select_visible,
+    DLG_OT_retarget_actions_deselect_all
 )
 
 

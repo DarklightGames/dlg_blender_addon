@@ -4,7 +4,7 @@ from bpy.types import UIList, Panel, bpy_prop_collection
 from . import operators as ops
 
 
-class DLG_PT_retarget(Panel):
+class DLG_PT_retarget_actions(Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = 'data'
@@ -37,9 +37,9 @@ class DLG_PT_retarget(Panel):
         selection_row = layout.row(align=True)
         selection_row.label(text=f'Select')
         selection_row.operator(
-            ops.DLG_OT_actions_select_visible.bl_idname, text=f'Visible', icon='CHECKBOX_HLT')
+            ops.DLG_OT_retarget_actions_select_visible.bl_idname, text=f'Visible', icon='CHECKBOX_HLT')
         selection_row.operator(
-            ops.DLG_OT_actions_deselect_all.bl_idname, text=f'None', icon='CHECKBOX_DEHLT')
+            ops.DLG_OT_retarget_actions_deselect_all.bl_idname, text=f'None', icon='CHECKBOX_DEHLT')
 
         # Action list
         action_list_row = layout.row()
@@ -48,7 +48,7 @@ class DLG_PT_retarget(Panel):
 
         # Controls
         bake_button_row = layout.row()
-        bake_button_row.operator(ops.DLG_OT_actions_retarget.bl_idname, text=f'Retarget')
+        bake_button_row.operator(ops.DLG_OT_retarget_actions_apply.bl_idname, text=f'Retarget')
 
         # debug_row = layout.row()
         # debug_row.operator(DLG_OP_DebugTest.bl_idname, text=f'DEBUG TEST')
@@ -77,7 +77,7 @@ class DLG_UL_retarget_action_list(UIList):
 
 
 _classes = (
-    DLG_PT_retarget,
+    DLG_PT_retarget_actions,
     DLG_UL_retarget_action_list
 )
 
